@@ -4,7 +4,7 @@
     { name: 'Orashare Portable Emergency Light', image: 'public/Portable_light.png', alt: 'Orashare Portable Emergency Light', url: 'https://shopee.ph/product/264015657/51602808448?exp_group=rollout&gads_t_sig=gqRjZGVrxHCFomtpsTE0MjUxOnRzc19zZGtfa2V5omt20QACpGFsZ2_SAAAAZKNkZWvAomN0xEAAAAAMc1TPTF0zl9lUk9doKYfbtNkYCBZaTm6dQ6q3WJIrnGYlyLtpSCE1-D6jy2YmlKEe_b7zxJZfI6lpwZ6fqmNpcGhlcnRleHTEkwAAAAxAuRZ8mVldY-Fc-3DRNMy9RKCN1chU98kCTL4b1zr68zQLobEUXQ6czDOcumDluU5p4CBchD0kFKPWSgWQBfoFpXMyXA6xDA2HY9p4n4XRal0WGeKRIyRUbxNU5GGss3S8cioyn1EtQCbNYXroBaNLgoXx0z6WhN4mX5OV5-sl8XiUILsEk-eK5GLg7_9Xgg&mmp_pid=an_13321520220&share_channel_code=5&uls_trackid=575h24k600sp&utm_campaign=id_1IOAbhXkSNd&utm_content=----&utm_medium=affiliates&utm_source=an_13321520220&utm_term=fvbf6qamz1kk' }
   ];
   const $ = id => document.getElementById(id);
-  const intro = $('intro'), page = $('page'), card = $('card');
+  const intro = $('intro'), page = $('page'), card = $('card'), loadProgress = $('loadProgress');
   let index = 0, audioContext = null, soundOn = false, entered = false;
   const soundButton = $('sound');
 
@@ -43,6 +43,14 @@
     window.setTimeout(() => { intro.hidden = true; }, 850);
   }
   // The cover exits at exactly 3 seconds; tapping it enters immediately and unlocks audio.
+  const loadingStartedAt = performance.now();
+  function updateLoadingProgress(now) {
+    if (entered) return;
+    const progress = Math.min((now - loadingStartedAt) / 3000, 1);
+    loadProgress.style.width = (progress * 100) + '%';
+    if (progress < 1) window.requestAnimationFrame(updateLoadingProgress);
+  }
+  window.requestAnimationFrame(updateLoadingProgress);
   window.setTimeout(() => enterExperience(false), 3000);
   $('enter').addEventListener('click', () => enterExperience(true));
   intro.addEventListener('pointerdown', event => { if (event.target !== $('enter')) { unlockAudio(); } }, { passive: true });
